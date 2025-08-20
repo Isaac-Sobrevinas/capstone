@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import authService from "@/features/auth/api/authService";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -13,18 +14,22 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
+
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [employeeIdError, setEmployeeIdError] = useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
-      setEmailError("Email is required");
-      setPasswordError("Password is required");
-      setConfirmPasswordError("Confirm Password is required");
+    if (!email || !password || !confirmPassword || !employeeId) {
+      if (!email) setEmailError("Email is required");
+      if (!password) setPasswordError("Password is required");
+      if (!confirmPassword) setConfirmPasswordError("Confirm Password is required");
+      if (!employeeId) setEmployeeIdError("Employee ID is required");
       return;
     }
 
@@ -37,8 +42,16 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-    } catch (err) {
-      setError("Something went wrong");
+      const res = await authService.register(email, password, employeeId);
+
+      // Optional: auto-login by saving token
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+      }
+
+      router.push("/auth"); // redirect to login page
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -48,6 +61,7 @@ const RegisterPage = () => {
     <Container>
       <div className="w-1/3 mx-auto mt-20 p-6 bg-white rounded-lg">
         <h1 className="mb-6 text-center">REGISTER</h1>
+
         <Input
           type="email"
           placeholder="Email"
@@ -61,6 +75,7 @@ const RegisterPage = () => {
           className="mb-3"
           label="Email"
         />
+
         <Input
           label="Password"
           type="password"
@@ -74,6 +89,7 @@ const RegisterPage = () => {
           }}
           hasError={!!passwordError}
         />
+
         <Input
           label="Confirm Password"
           type="password"
@@ -88,6 +104,20 @@ const RegisterPage = () => {
           hasError={!!confirmPasswordError}
         />
 
+        <Input
+          label="Employee ID"
+          type="text"
+          placeholder="Employee ID"
+          className="mb-3"
+          value={employeeId}
+          error={employeeIdError}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setEmployeeId(e.target.value);
+            setEmployeeIdError("");
+          }}
+          hasError={!!employeeIdError}
+        />
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <Button
@@ -95,12 +125,11 @@ const RegisterPage = () => {
           disabled={loading}
           onClick={handleRegister}
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </Button>
+
         <div className="text-center mt-3">
-          <Link href="/auth">
-            Go Back
-          </Link>
+          <Link href="/auth">Go Back</Link>
         </div>
       </div>
     </Container>

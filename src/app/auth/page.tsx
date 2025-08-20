@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import authService from "@/features/auth/api/authService";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -19,8 +20,8 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setEmailError("Email is required");
-      setPasswordError("Password is required");
+      if (!email) setEmailError("Email is required");
+      if (!password) setPasswordError("Password is required");
       return;
     }
 
@@ -28,8 +29,32 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-    } catch (err) {
-      setError("Something went wrong");
+      const data = await authService.login(email, password);
+
+      if (data.token) {
+        // ✅ Save token
+        localStorage.setItem("token", data.token);
+
+        // (Optional) fetch profile from protected route
+        try {
+          const res = await fetch("http://localhost:8000/api/users/profile", {
+            headers: {
+              Authorization: `Bearer ${data.token}`,
+            },
+          });
+          const profile = await res.json();
+          console.log("User profile:", profile);
+        } catch (err) {
+          console.error("Error fetching profile:", err);
+        }
+
+        // ✅ Redirect after login
+        router.push("/dashboard");
+      } else {
+        setError("Invalid credentials");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -64,6 +89,7 @@ const LoginPage = () => {
             setPasswordError("");
           }}
           hasError={!!passwordError}
+          onKeyDown={(e) => e.key === "Enter" && handleLogin()} // ✅ enter key support
         />
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -74,7 +100,7 @@ const LoginPage = () => {
           onClick={handleLogin}
           disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </Button>
         <Button
           className="w-full mt-3"
