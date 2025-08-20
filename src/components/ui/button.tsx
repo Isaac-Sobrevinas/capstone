@@ -21,7 +21,7 @@ export const Button = ({
     return (
         <button
             className={cn(
-                "px-4 py-2 rounded-md focus:outline-none",
+                "px-4 py-2 rounded-md focus:outline-none cursor-pointer",
                 {
                     "bg-black text-white": variant === "default",
                     "border border-black text-black": variant === "outline",
