@@ -1,29 +1,45 @@
 'use client';
 
-import { Button } from "@/components/ui/button"
-import authService from "@/features/auth/api/authService"
-import { useEffect } from "react"
-
-/* react js */
-
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import authService from "@/features/auth/api/authService";
 
 const DashboardPage = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-    const activate = async () => {
-        let message = await authService.test();
-        console.log(message);
-    }
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
 
-    useEffect(() => {
-        activate();
-    }, [])
+      if (!token) {
+        router.push("/auth/"); // no token → redirect
+        return;
+      }
 
-    return (
-        <Button>hello</Button>
-    )
-}
+      try {
+        // call protected backend route with token
+        await authService.test(token);
+        setLoading(false); // token valid → show dashboard
+      } catch (err) {
+        console.error("Token invalid or expired:", err);
+        localStorage.removeItem("token"); // remove bad token
+        router.push("/auth/"); // redirect to login
+      }
+    };
 
+    verifyToken();
+  }, [router]);
 
+  if (loading) return <p>Loading...</p>;
 
-export default DashboardPage
+  return (
+    <div>
+      <h1>Welcome to the Dashboard!</h1>
+      <Button>hello</Button>
+    </div>
+  );
+};
+
+export default DashboardPage;

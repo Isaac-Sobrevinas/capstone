@@ -11,8 +11,21 @@ const authService = {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
-    return data;
+    return data; // should return { token, user }
   },
+
+  // Test protected route
+  test: async (token: string) => {
+    const res = await fetch("http://localhost:8000/api/users/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Unauthorized");
+    return res.json();
+  },
+
 
   // Register
   register: async (email: string, password: string, employee_id: string) => {
