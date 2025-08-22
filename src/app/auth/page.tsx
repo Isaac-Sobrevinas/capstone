@@ -30,6 +30,8 @@ const LoginPage = () => {
 
     try {
       const data = await authService.login(email, password);
+      console.log("Logging in...");
+      console.log(data);
 
       if (data.token) {
         // ✅ Save token
