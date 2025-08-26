@@ -32,6 +32,51 @@ const employeeService = {
 
     return employees;
   },
+  getById: async (employeeId: number) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      `${common.BASE_URL}employees/${employeeId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch employee");
+    }
+    const data = await response.json();
+    const employee: Employee = {
+      employeeId: data.employee_id,
+      email: data.email,
+      firstName: data.first_name,
+      middleName: data.middle_name,
+      lastName: data.last_name,
+      isActive: data.is_active,
+      roleId: data.role_id,
+      driversLicense: data.drivers_license,
+      createdBy: data.created_by,
+      createdDate: data.created_date,
+      updatedBy: data.updated_by,
+      updatedDate: data.updated_date,
+    };
+    return employee;
+  },
+  update: async (employee: Employee) => {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${common.BASE_URL}employees/${employee.employeeId}`, {
+      method: "PUT",
+      headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(employee),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch employees");
+    }
+    const data = await response.json();
+  }
 };
 
 export default employeeService;

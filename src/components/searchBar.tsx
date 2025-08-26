@@ -8,7 +8,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
     };
 
     return (
-        <input type="text" placeholder="Search ..." className="border py-1 px-2 w-full border-gray-500" onChange={handleSearch} />
+        <input type="text" placeholder="Search ..." className="border py-1 px-2 w-full border-gray-200 bg-white text-sm" onChange={handleSearch} />
     )
 }
 
