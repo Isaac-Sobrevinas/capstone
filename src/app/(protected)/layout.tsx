@@ -11,6 +11,8 @@ const Navbar = () => {
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/employees", label: "Employees" },
+    { href: "/maintenance", label: "Maintenance" },
+    { href: "/protrack", label: "Track" },
   ];
   return (
     <nav className="w-full bg-black text-white h-12 flex flex-row justify-between">

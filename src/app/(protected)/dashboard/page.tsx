@@ -35,9 +35,10 @@ const DashboardPage = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1>Welcome to the Dashboard!</h1>
-      <Button>hello</Button>
+    <div className="flex h-screen items-center justify-center bg-gray-50">
+      <h1 className="text-5xl font-bold text-gray-800 text-center">
+        Welcome to the Dashboard!
+      </h1>
     </div>
   );
 };
